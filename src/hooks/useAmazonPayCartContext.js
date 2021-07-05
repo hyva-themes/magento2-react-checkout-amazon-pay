@@ -4,7 +4,11 @@ import CartContext from '../../../../context/Cart/CartContext';
 
 export default function useAmazonPayCartContext() {
   const [cartData, cartActions] = useContext(CartContext);
-  const { setPaymentMethod } = cartActions;
+  const {
+    setPaymentMethod,
+    addCartShippingAddress,
+    setCartBillingAddress,
+  } = cartActions;
 
   const cartId = _get(cartData, 'cart.id');
   const cart = _get(cartData, 'cart');
@@ -20,5 +24,7 @@ export default function useAmazonPayCartContext() {
     selectedShippingMethod,
     hasCartBillingAddress,
     setPaymentMethod,
+    addCartShippingAddress,
+    setCartBillingAddress,
   };
 }
