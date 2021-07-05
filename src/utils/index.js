@@ -5,8 +5,11 @@ export const parseAddress = (amazonAddress, cartId) => ({
   country: amazonAddress.country_id,
   firstname: amazonAddress.firstname,
   lastname: amazonAddress.lastname,
+  fullName: `${amazonAddress.firstname} ${amazonAddress.lastname}`,
   phone: amazonAddress.telephone,
   region: amazonAddress.region,
   street: amazonAddress.street,
   zipcode: amazonAddress.postcode,
+  prefix: amazonAddress.prefix ?? 'Herr',
+  isSameAsShipping: amazonAddress.isSameAsShipping,
 });

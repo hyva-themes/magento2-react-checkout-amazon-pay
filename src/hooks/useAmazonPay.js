@@ -24,7 +24,7 @@ const getCheckoutSessionId = query => {
 export default function useAmazonPay(paymentMethodCode) {
   const [processPaymentEnable, setProcessPaymentEnable] = useState(false);
   const [amazonAddressesSet, setAmazonAddressesSet] = useState(false);
-  const performPlaceOrder = usePerformPlaceOrder(paymentMethodCode);
+  const performPlaceOrder = usePerformPlaceOrder();
   const {
     selectedShippingMethod,
     selectedPaymentMethod,
@@ -32,6 +32,7 @@ export default function useAmazonPay(paymentMethodCode) {
     cartId,
     addCartShippingAddress,
     setCartBillingAddress,
+    setPaymentMethod,
   } = useAmazonPayCartContext();
   const { setErrorMessage, setPageLoader } = useAmazonPayAppContext();
   const { allAgreementsChecked, hasAgreements } = useCheckoutAgreements();
@@ -121,28 +122,26 @@ export default function useAmazonPay(paymentMethodCode) {
     try {
       const [shippingAddress] = await restGetShippingAddress(checkoutSessionId);
       const [billingAddress] = await restGetBillingAddress(checkoutSessionId);
-      setPageLoader(false);
 
       if (!shippingAddress || !billingAddress) {
         setErrorMessage(__('Amazon pay not available'));
+
         return false;
       }
 
-      const isBillingSame = billingAddress === shippingAddress;
+      const isSameAsShipping = billingAddress === shippingAddress;
 
       const updateShippingAddress = _makePromise(
         addCartShippingAddress,
         parseAddress(shippingAddress, cartId),
-        isBillingSame
+        isSameAsShipping
       );
 
       const updateBillingAddress = _makePromise(
         setCartBillingAddress,
-        parseAddress(billingAddress, cartId),
-        isBillingSame
+        parseAddress({ ...billingAddress, isSameAsShipping }, cartId),
+        isSameAsShipping
       );
-
-      setPageLoader(true);
 
       const shippingAddressResponse = await updateShippingAddress();
       const billingAddressResponse = await updateBillingAddress();
@@ -160,8 +159,12 @@ export default function useAmazonPay(paymentMethodCode) {
       );
 
       setFieldValue(BILLING_ADDR_FORM, billingAddressToSet);
+
+      await setPaymentMethod({ code: paymentMethodCode });
+
       setAmazonAddressesSet(true);
       setPageLoader(false);
+
       return true;
     } catch (error) {
       console.log({ error });
@@ -178,6 +181,8 @@ export default function useAmazonPay(paymentMethodCode) {
     setPageLoader,
     setCartBillingAddress,
     setFieldValue,
+    setPaymentMethod,
+    paymentMethodCode,
   ]);
 
   /* Checking if amazon addresses are right */

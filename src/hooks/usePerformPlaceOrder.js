@@ -1,18 +1,15 @@
 import { useCallback } from 'react';
 import { __ } from '../../../../i18n';
 import useAmazonPayAppContext from './useAmazonPayAppContext';
-import useAmazonPayCartContext from './useAmazonPayCartContext';
 import restUpdateCheckoutSessionConfig from '../api/restUpdateCheckoutSessionConfig';
 
-export default function usePerformPlaceOrder(paymentMethodCode) {
+export default function usePerformPlaceOrder() {
   const { setErrorMessage, setPageLoader } = useAmazonPayAppContext();
-  const { setPaymentMethod } = useAmazonPayCartContext();
 
   return useCallback(
     async checkoutSessionId => {
       try {
         setPageLoader(true);
-        await setPaymentMethod({ code: paymentMethodCode });
         const updateResponse = await restUpdateCheckoutSessionConfig(
           checkoutSessionId
         );
@@ -32,6 +29,6 @@ export default function usePerformPlaceOrder(paymentMethodCode) {
         setPageLoader(false);
       }
     },
-    [paymentMethodCode, setPageLoader, setErrorMessage, setPaymentMethod]
+    [setPageLoader, setErrorMessage]
   );
 }
