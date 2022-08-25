@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import _get from 'lodash.get';
+import { get as _get } from 'lodash-es';
 
 import { __ } from '../../../../i18n';
 import useSaveAddresses from './useSaveAddresses';
@@ -15,12 +15,12 @@ import restGetCheckoutSessionConfig from '../api/restGetCheckoutSessionConfig';
 
 export default function useAmazonPay(paymentMethodCode) {
   const [processPaymentEnable, setProcessPaymentEnable] = useState(false);
+  const saveAddresses = useSaveAddresses();
+  const performPlaceOrder = usePerformPlaceOrder();
+  const { setFieldValue } = useAmazonPayFormikContext();
   const { selectedPaymentMethod } = useAmazonPayCartContext();
   const { appDispatch, setErrorMessage, setPageLoader } =
     useAmazonPayAppContext();
-  const performPlaceOrder = usePerformPlaceOrder();
-  const saveAddresses = useSaveAddresses();
-  const { setFieldValue } = useAmazonPayFormikContext();
   const searchQuery = window.location.search;
   const selectedPaymentMethodCode = _get(selectedPaymentMethod, 'code');
 
@@ -156,9 +156,9 @@ export default function useAmazonPay(paymentMethodCode) {
   }, [searchQuery, performPlaceOrder]);
 
   return {
-    placeAmazonPayOrder,
-    getCheckoutSessionConfig,
-    processPaymentEnable,
     setAddresses,
+    placeAmazonPayOrder,
+    processPaymentEnable,
+    getCheckoutSessionConfig,
   };
 }
