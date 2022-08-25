@@ -1,24 +1,24 @@
-import { func, shape, string } from 'prop-types';
 import React, { useCallback, useEffect } from 'react';
-import _get from 'lodash.get';
-import RadioInput from '../../../../components/common/Form/RadioInput';
+import { func, shape, string } from 'prop-types';
+
+import { RadioInput } from '../../../../app/code/common/Form';
 import useAmazonPay from '../hooks/useAmazonPay';
-import useAmazonPayCheckoutFormContext from '../hooks/useAmazonPayCheckoutFormContext';
-import useAmazonPayCartContext from '../hooks/useAmazonPayCartContext';
 import useAmazonPayAppContext from '../hooks/useAmazonPayAppContext';
+import useAmazonPayCartContext from '../hooks/useAmazonPayCartContext';
+import useAmazonPayCheckoutFormContext from '../hooks/useAmazonPayCheckoutFormContext';
 
 function AmazonPay({ method, selected, actions }) {
-  const methodCode = _get(method, 'code');
+  const methodCode = method.code;
   const {
-    getCheckoutSessionConfig,
+    setAddresses,
     placeAmazonPayOrder,
     processPaymentEnable,
-    setAddresses,
+    getCheckoutSessionConfig,
   } = useAmazonPay(methodCode);
-  const { setPaymentMethod, selectedPaymentMethod } = useAmazonPayCartContext();
   const { setPageLoader } = useAmazonPayAppContext();
-  const isSelected = methodCode === selected.code;
   const { registerPaymentAction } = useAmazonPayCheckoutFormContext();
+  const { setPaymentMethod, selectedPaymentMethod } = useAmazonPayCartContext();
+  const isSelected = methodCode === selected.code;
 
   const initalizeAmazonPaymentOnSelection = useCallback(async () => {
     setPageLoader(true);
@@ -28,11 +28,11 @@ function AmazonPay({ method, selected, actions }) {
     }
     setPageLoader(false);
   }, [
-    setPageLoader,
-    getCheckoutSessionConfig,
-    selectedPaymentMethod,
     methodCode,
+    setPageLoader,
     setPaymentMethod,
+    selectedPaymentMethod,
+    getCheckoutSessionConfig,
   ]);
 
   useEffect(() => {
@@ -47,22 +47,22 @@ function AmazonPay({ method, selected, actions }) {
       registerPaymentAction(methodCode, placeAmazonPayOrder);
     }
   }, [
-    setAddresses,
-    processPaymentEnable,
     methodCode,
-    registerPaymentAction,
+    setAddresses,
     placeAmazonPayOrder,
+    processPaymentEnable,
+    registerPaymentAction,
   ]);
 
   if (isSelected) {
     return (
       <>
         <RadioInput
+          value={method.code}
           label={method.title}
           name="paymentMethod"
-          value={method.code}
-          onChange={actions.change}
           checked={isSelected}
+          onChange={actions.change}
         />
         <div id="AmazonPayButton" />
       </>
@@ -73,11 +73,11 @@ function AmazonPay({ method, selected, actions }) {
     <div className="w-full">
       <div>
         <RadioInput
-          label={_get(method, 'title')}
+          value={methodCode}
           name="paymentMethod"
-          value={_get(method, 'code')}
-          onChange={actions.change}
           checked={isSelected}
+          label={method.title}
+          onChange={actions.change}
         />
       </div>
     </div>
